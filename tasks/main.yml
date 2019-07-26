@@ -1,0 +1,35 @@
+---
+# tasks file for kubectl
+
+- name: Add Kubectl repository
+  become: true
+  copy:
+    src: kubernetes.repo
+    dest: '/etc/yum.repos.d/kubernetes.repo'
+    mode: 0644
+
+- name: Install kubectl
+  package:
+    name: kubectl
+    state: present
+
+- name: Enable kubectl autocompletion
+  become: true
+  shell: kubectl completion bash >/etc/bash_completion.d/kubectl
+
+- name: create .kube folder
+  file:
+    path: "{{  kube_home }}"
+    state: directory
+    owner: "{{ lookup('env','USER') }}"
+    group: "{{ lookup('env','USER') }}"
+
+- name: copy kubeconfig files
+  copy:
+    src: "{{ item }}"
+    dest: "{{  kube_home }}/{{ item }}"
+    owner: "{{ lookup('env','USER') }}"
+    group: "{{ lookup('env','USER') }}"
+    mode: 0644
+  with_items:
+    - "{{ kubeconfig_files }}"
