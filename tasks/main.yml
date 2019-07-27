@@ -13,6 +13,11 @@
     name: kubectl
     state: present
 
+- name: Define kubectl user
+  set_fact:
+    role_user: "{{ ansible_user | default(lookup('env', 'USER')) }}"
+  when: role_user == ''
+
 - name: Enable kubectl autocompletion
   become: true
   shell: kubectl completion bash >/etc/bash_completion.d/kubectl
@@ -21,15 +26,15 @@
   file:
     path: "{{  kube_home }}"
     state: directory
-    owner: "{{ lookup('env','USER') }}"
-    group: "{{ lookup('env','USER') }}"
+    owner: "{{ role_user }}"
+    group: "{{ role_user }}"
 
 - name: copy kubeconfig files
   copy:
     src: "{{ item }}"
     dest: "{{  kube_home }}/{{ item }}"
-    owner: "{{ lookup('env','USER') }}"
-    group: "{{ lookup('env','USER') }}"
+    owner: "{{ role_user }}"
+    group: "{{ role_user }}"
     mode: 0644
   with_items:
     - "{{ kubeconfig_files }}"

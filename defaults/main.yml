@@ -1,7 +1,8 @@
 ---
 # defaults file for kubectl
 
-kube_home: "{{ ansible_env.HOME }}/.kube"
+role_user: ""
+kube_home: "/home/{{ role_user }}/.kube"
 kubeconfig_files:
   - staging-config
   - preprod-config
